@@ -2,7 +2,7 @@
   'use strict';
 
   angular.module('arkclient')
-         .service('accountService', ['$q', '$http', 'networkService', 'storageService', 'gettextCatalog', AccountService]);
+         .service('accountService', ['configService', '$q', '$http', 'networkService', 'storageService', 'gettextCatalog', AccountService]);
 
   /**
    * Accounts DataService
@@ -12,9 +12,10 @@
    * @returns {{loadAll: Function}}
    * @constructor
    */
-  function AccountService($q, $http, networkService, storageService, gettextCatalog){
+  function AccountService(configService, $q, $http, networkService, storageService, gettextCatalog){
 
     var ark=require('arkjs');
+    var config = configService.getDefaults();
 
     var TxTypes = {
       0:"Send Ark",
@@ -234,7 +235,7 @@
         transaction.total=-transaction.amount-transaction.fee;
       }
       // to avoid small transaction to be displayed as 1e-8
-      transaction.humanTotal = numberToFixed(transaction.total / 100000000) + ''
+      transaction.humanTotal = numberToFixed(transaction.total / config.wallet.unitToSatoshi) + ''
 
       return transaction;
     }

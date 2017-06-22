@@ -29,7 +29,8 @@ angular.module('arkclient').factory('configService', function(gettextCatalog, st
       windowSize: {},
       currency: {name:"btc",symbol:"Ƀ"},
       language: 'en',
-      background: 'url(assets/img/images/Ark.jpg)'
+      background: 'url(assets/img/images/Ark.jpg)',
+      playFundsReceivedSong: false
     },
 
     coinmarketcap: {
@@ -45,16 +46,11 @@ angular.module('arkclient').factory('configService', function(gettextCatalog, st
   var userConfig = null;
 
   root.get = function() {
-    var localConfig = storageService.get('config');
+    var localConfig = storageService.getGlobal('config');
 
-    if (localConfig) {
-      userConfig = localConfig;
-    } else {
-      userConfig = defaultConfig;
-    }
-
+    userConfig = localConfig || defaultConfig;
     return userConfig;
-  }
+  };
 
   /*
   * Override default config with user options
@@ -64,7 +60,7 @@ angular.module('arkclient').factory('configService', function(gettextCatalog, st
   */
   root.set = function(newOptions) {
     var config = defaultConfig;
-    var oldOptions = storageService.get('config') || {};
+    var oldOptions = storageService.getGlobal('config') || {};
 
     if (typeof oldOptions === 'string') {
       oldOptions = JSON.parse(oldOptions);
@@ -76,9 +72,13 @@ angular.module('arkclient').factory('configService', function(gettextCatalog, st
 
     lodash.merge(config, oldOptions, newOptions);
     userConfig = config;
-
-    storageService.set('config', config);
+    storageService.setGlobal('config', config);
   };
+
+  root.setPreference = function(preference) {
+    var option = {application: preference};
+    return root.set(option);
+  }
 
   root.reset = function() {
     storageService.set('config', defaultConfig);
@@ -87,6 +87,10 @@ angular.module('arkclient').factory('configService', function(gettextCatalog, st
   root.getDefaults = function() {
     return defaultConfig;
   };
+
+  root.getPreferences = function() {
+    return root.get().application;
+  }
 
   return root;
 });

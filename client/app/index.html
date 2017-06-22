@@ -28,7 +28,7 @@
 
   </head>
 
-  <body back-image id="app" ng-app="arkApp" layout="column" ng-controller="AccountController as ul" ng-cloak>
+  <body background-img="{{ul.backgroundImg}}" id="app" ng-app="arkApp" layout="column" ng-controller="AccountController as ul" ng-cloak>
     <md-toolbar style="background-color: rgba(0, 0, 0, 0);">
        <div class="md-toolbar-tools" style="-webkit-app-region: drag;">
          <img src="ark.png" alt="" height="30">
@@ -261,7 +261,7 @@
 
                    </span>
                    <span class="md-secondary">
-                     {{ul.network.symbol}}{{it.balance/100000000}}
+                     {{ul.network.symbol}}{{it.balance/ul.defaultConfig.wallet.unitToSatoshi}}
                    </span>
 
                </md-list-item>
@@ -389,8 +389,8 @@
 
                 </span>
                 <span class="md-subhead description">
-                  <translate>Balance</translate> {{ul.network.symbol}}{{ul.selected.balance/100000000}}
-                  <md-button ng-click="ul.changeCurrency()">{{ul.currency.symbol}} {{(ul.selected.balance/100000000*ul.connectedPeer.market.price[ul.currency.name]).toFixed(4)}}</md-button>
+                  <translate>Balance</translate> {{ul.network.symbol}}{{ul.selected.balance/ul.defaultConfig.wallet.unitToSatoshi}}
+                  <md-button ng-click="ul.changeCurrency()">{{ul.currency.symbol}} {{(ul.selected.balance/ul.defaultConfig.wallet.unitToSatoshi*ul.connectedPeer.market.price[ul.currency.name]).toFixed(4)}}</md-button>
                 </span>
               </md-card-title-text>
             </md-card-title>
@@ -737,9 +737,9 @@
                 </md-list-item>
 
                 <md-list-item>
-                  <h3><translate>Default</translate> {{ul.currency.symbol}} {{(ul.getDefaultValue(ul.selected)/100000000*ul.connectedPeer.market.price[ul.currency.name]).toFixed(4)}}</h3>
+                  <h3><translate>Default</translate> {{ul.currency.symbol}} {{(ul.getDefaultValue(ul.selected)/self.defaultConfig.wallet.unitToSatoshi*ul.connectedPeer.market.price[ul.currency.name]).toFixed(4)}}</h3>
                   <span class="md-secondary">
-                    <md-button md-block md-colors="{'background' : ul.getDefaultValue(ul.selected)>0 ? 'default-green-200':'default-red-200' }"> {{ul.getDefaultValue(ul.selected)/100000000}}</md-button>
+                    <md-button md-block md-colors="{'background' : ul.getDefaultValue(ul.selected)>0 ? 'default-green-200':'default-red-200' }"> {{ul.getDefaultValue(ul.selected)/self.defaultConfig.wallet.unitToSatoshi}}</md-button>
                   </span>
                 </md-list-item>
                 <md-list-item ng-repeat="folder in ul.selected.virtual.getFolders()">
@@ -767,7 +767,7 @@
                     <md-input-container>
                       <label>{{'Amount'|translate}} (ARK)</label>
                       <input ng-model-options="{ getterSetter: true }" ng-model="ul.selected.virtual.uservalue(folder)" ng-change="ul.saveFolder(ul.selected,folder)" type="number" >
-                      <div class="hint"> {{ul.currency.symbol}} {{(ul.selected.virtual[folder].amount/100000000*ul.connectedPeer.market.price[ul.currency.name]).toFixed(4)}} </div>
+                      <div class="hint"> {{ul.currency.symbol}} {{(ul.selected.virtual[folder].amount/self.defaultConfig.wallet.unitToSatoshi*ul.connectedPeer.market.price[ul.currency.name]).toFixed(4)}} </div>
                     </md-input-container>
                   </span>
 

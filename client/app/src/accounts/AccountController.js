@@ -2,7 +2,7 @@
   angular
        .module('arkclient')
        .controller('AccountController', [
-          'accountService', 'networkService', 'storageService', 'changerService', '$mdToast', '$mdSidenav', '$mdBottomSheet', '$timeout', '$interval', '$log', '$mdDialog', '$scope', '$mdMedia', 'gettextCatalog',
+          'configService', 'accountService', 'networkService', 'storageService', 'changerService', '$mdToast', '$mdSidenav', '$mdBottomSheet', '$timeout', '$interval', '$log', '$mdDialog', '$scope', '$mdMedia', 'gettextCatalog',
           AccountController
        ]).filter('accountlabel', ['accountService', function(accountService) {
           return function(address) {
@@ -77,9 +77,11 @@
    * @param avatarsService
    * @constructor
    */
-  function AccountController( accountService, networkService, storageService, changerService, $mdToast, $mdSidenav, $mdBottomSheet, $timeout, $interval, $log, $mdDialog, $scope, $mdMedia, gettextCatalog) {
+  function AccountController(configService, accountService, networkService, storageService, changerService, $mdToast, $mdSidenav, $mdBottomSheet, $timeout, $interval, $log, $mdDialog, $scope, $mdMedia, gettextCatalog) {
 
     var self = this;
+    
+    self.defaultConfig = configService.getDefaults();
 
     var languages = {
       en:gettextCatalog.getString("English"),
@@ -103,7 +105,8 @@
 
 
     gettextCatalog.debug = false;
-    self.language  = storageService.get("language");
+    // self.language  = storageService.get("language");
+    self.language = configService.getPreferences().language;
     if(!self.language) selectNextLanguage();
     else gettextCatalog.setCurrentLanguage(self.language);
 
@@ -133,6 +136,11 @@
       require('electron').shell.openExternal(url);
     };
 
+    self.getBackgroundImage = function() {
+      return configService.getPreferences().background;
+    };
+
+    self.backgroundImg = self.getBackgroundImage();
     self.openExplorer = openExplorer;
     self.clientVersion = require('../../package.json').version;
     self.latestClientVersion = self.clientVersion;
@@ -152,7 +160,7 @@
     self.createSecondPassphrase  = createSecondPassphrase;
     self.copiedToClipboard  = copiedToClipboard;
 
-    self.playFundsReceivedSong = storageService.get("playFundsReceivedSong") || false;
+    self.playFundsReceivedSong = configService.getPreferences().playFundsReceivedSong || false;
     self.togglePlayFundsReceivedSong = togglePlayFundsReceivedSong;
     self.manageBackgrounds  = manageBackgrounds;
     self.manageNetworks  = manageNetworks;
@@ -162,7 +170,7 @@
     self.addDelegate = addDelegate;
     self.showAccountMenu  = showAccountMenu;
     self.selectNextLanguage = selectNextLanguage;
-    self.currency = storageService.get("currency") || {name:"btc",symbol:"Ƀ"};
+    self.currency = configService.getPreferences().currency || {name:"btc",symbol:"Ƀ"};
     self.switchNetwork = networkService.switchNetwork;
     self.network = networkService.getNetwork();
     self.marketinfo= {};
@@ -263,7 +271,8 @@
 
     $scope.setLanguage = function () {
       self.language = languages.getKeyByValue(this.selectedLanguage);
-      storageService.set("language", self.language);
+      // storageService.set("language", self.language);
+      configService.setPreference({language: self.language});
       gettextCatalog.setCurrentLanguage(self.language);
     }
 
@@ -353,7 +362,7 @@
           {
             fromAddress: self.selected.address,
             toAddress: resp.payee,
-            amount: parseInt(resp.send_amount*100000000),
+            amount: parseInt(resp.send_amount*self.defaultConfig.wallet.unitToSatoshi),
             masterpassphrase: self.passphrase,
             secondpassphrase: self.secondpassphrase
           }
@@ -470,7 +479,7 @@
     self.myAccountsBalance = function(){
       return (self.myAccounts().reduce(function(memo,acc){
         return memo+parseInt(acc.balance);
-      },0)/100000000).toFixed(2);
+      },0)/self.defaultConfig.wallet.unitToSatoshi).toFixed(2);
     }
 
     self.otherAccounts = function(){
@@ -502,7 +511,7 @@
       ];
       self.currency=currencies[currencies.map(function(x) {return x.name; }).indexOf(self.currency.name)+1];
       if(self.currency==undefined) self.currency=currencies[0];
-      storageService.set("currency",self.currency);
+      configService.setPreference({currency: self.currency});
     };
 
     self.pickRandomPeer=function(){
@@ -522,7 +531,7 @@
     };
 
     self.saveFolder=function(account,folder){
-      accountService.setToFolder(account.address,folder,account.virtual.uservalue(folder)()*100000000);
+      accountService.setToFolder(account.address,folder,account.virtual.uservalue(folder)()*self.defaultConfig.wallet.unitToSatoshi);
     }
 
     self.deleteFolder=function(account, foldername){
@@ -656,10 +665,10 @@
               return b.timestamp-a.timestamp;
             });
 
-            var previousTx = self.selected.transactions
+            var previousTx = self.selected.transactions;
             self.selected.transactions = transactions;
 
-            var playSong = storageService.get('playFundsReceivedSong');
+            var playSong = configService.getPreferences().playFundsReceivedSong;
             if (playSong == true && transactions.length > previousTx.length && transactions[0].type == 0 && transactions[0].recipientId == myaccount.address) {
               var wavFile = require('path').resolve(__dirname, 'assets/audio/power-up.wav');
               var audio = new Audio(wavFile);
@@ -691,7 +700,8 @@
     }
 
     function togglePlayFundsReceivedSong(status) {
-      storageService.set('playFundsReceivedSong', self.playFundsReceivedSong, true);
+      var option = {playFundsReceivedSong: self.playFundsReceivedSong};
+      configService.setPreference(option);
     }
 
     /**
@@ -1069,9 +1079,9 @@
       //   amount: 1,
       // };
       var totalBalance = function(minusFee) {
-        var fee = 10000000;
+        var fee = self.defaultConfig.fees.send;
         var balance = selectedAccount.balance;
-        return accountService.numberToFixed((minusFee ? balance - fee : balance) / 100000000);
+        return accountService.numberToFixed((minusFee ? balance - fee : balance) / self.defaultConfig.wallet.unitToSatoshi);
       };
 
       function fillSendableBalance() {
@@ -1096,7 +1106,7 @@
           {
             fromAddress: $scope.send.data.fromAddress,
             toAddress: $scope.send.data.toAddress,
-            amount: parseInt($scope.send.data.amount*100000000),
+            amount: parseInt($scope.send.data.amount*self.defaultConfig.wallet.unitToSatoshi),
             smartbridge: $scope.send.data.smartbridge,
             masterpassphrase: $scope.send.data.passphrase,
             secondpassphrase: $scope.send.data.secondpassphrase
@@ -1161,9 +1171,8 @@
     function manageBackgrounds(){
       var fs = require('fs');
       var path = require('path');
-      var context = storageService.getContext();
-      var currentNetwork = networkService.getNetwork();
-      var initialBackground = currentNetwork.background;
+
+      var initialBackground = self.getBackgroundImage();
 
       var backgrounds = {
         colors: {
@@ -1200,19 +1209,20 @@
       };
 
       function select(background) {
-        $scope.send.selected = background;
-        currentNetwork.background = background;
+        $scope.send.selected = self.backgroundImg = background;
       }
 
       function save() {
         $mdDialog.hide();
-        networkService.setNetwork(context, currentNetwork);
+        var option = { background: self.backgroundImg };
+        configService.setPreference(option);
+
         window.location.reload();
       };
 
       function cancel() {
         $mdDialog.hide();
-        currentNetwork.background = initialBackground;
+        self.backgroundImg = initialBackground;
       };
 
       $scope.send = {
@@ -1709,7 +1719,7 @@
         cancel:cancel,
         transaction:transaction,
         // to avoid small transaction to be displayed as 1e-8
-        humanAmount: accountService.numberToFixed(transaction.amount / 100000000) + '',
+        humanAmount: accountService.numberToFixed(transaction.amount / self.defaultConfig.wallet.unitToSatoshi) + '',
       };
 
       $mdDialog.show({
