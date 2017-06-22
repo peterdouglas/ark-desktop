@@ -2,13 +2,13 @@
   'use strict';
 
   angular.module('arkclient')
-         .service('networkService', ['$q', '$http', '$timeout', 'storageService', NetworkService]);
+         .service('networkService', ['$q', '$http', '$timeout', 'storageService', 'configService', NetworkService]);
 
   /**
    * NetworkService
    * @constructor
    */
-  function NetworkService($q,$http,$timeout,storageService){
+  function NetworkService($q,$http,$timeout,storageService,configService){
 
     var network=switchNetwork(storageService.getContext());
 
@@ -122,7 +122,8 @@
       // peer.market={
       //   price: { btc: '0' },
       // };
-      $http.get("http://coinmarketcap.northpole.ro/api/v5/"+network.token+".json",{timeout: 2000})
+      var coinmarketcap = configService.get().coinmarketcap;
+      $http.get(coinmarketcap.url+network.token+".json",{timeout: 2000})
       .then(function(res){
         if(res.data.price && res.data.price.btc)
           res.data.price.btc = Number(res.data.price.btc).toFixed(8); // store BTC price in satoshi
