@@ -28,7 +28,7 @@
 
   </head>
 
-  <body style="background:{{ul.network.background}};background-position:center" ng-style="ul.network.background.match('textures') ? {'background-repeat': 'repeat'} : {'background-size': 'cover'}" id="app" ng-app="arkApp" layout="column" ng-controller="AccountController as ul" ng-cloak>
+  <body back-image id="app" ng-app="arkApp" layout="column" ng-controller="AccountController as ul" ng-cloak>
     <md-toolbar style="background-color: rgba(0, 0, 0, 0);">
        <div class="md-toolbar-tools" style="-webkit-app-region: drag;">
          <img src="ark.png" alt="" height="30">
@@ -84,7 +84,7 @@
                 <md-list>
                   <md-list-item><b translate>Language</b>
                     <!--<md-button class="md-secondary" aria-label="Change Language" md-prevent-menu-close ng-click="ul.selectNextLanguage()">{{ul.getLanguage()}}</md-button>-->
-                    <md-select class="md-secondary" ng-model="selectedLanguage" ng-init="selectedLanguage = ul.getLanguage()" ng-change="setLanguage()">
+                    <md-select aria-label="Change Language" class="md-secondary" ng-model="selectedLanguage" ng-init="selectedLanguage = ul.getLanguage()" ng-change="setLanguage()">
                       <md-option ng-value="language" ng-repeat="language in ul.selectAllLanguages()">{{language}}</md-option>
                     </md-select>
                 </md-list-item>
@@ -814,12 +814,14 @@
   </div>
 
     <script src="../dependencies.min.js"></script>
+    <script src="../node_modules/ng-lodash/build/ng-lodash.min.js"></script>
     <script src="../node_modules/qrcode-generator/js/qrcode.js"></script>
     <script src="../node_modules/angular-qrcode/angular-qrcode.js"></script>
 
     <script src="src/translations.js"></script>
     <script src="src/accounts/Accounts.js"></script>
     <script src="src/storage/StorageService.js"></script>
+    <script src="src/config/ConfigService.js"></script>
     <script src="src/accounts/AccountService.js"></script>
     <script src="src/accounts/AccountController.js"></script>
     <script src="src/network/NetworkService.js"></script>
@@ -832,7 +834,7 @@
     <script type="text/javascript">
 
           angular
-              .module('arkApp', ['ngMaterial', 'md.data.table', 'arkclient', 'gettext','monospaced.qrcode'])
+              .module('arkApp', ['ngMaterial', 'md.data.table', 'arkclient', 'gettext','monospaced.qrcode', 'ngLodash'])
               .config(function($mdThemingProvider, $mdIconProvider){
                   $mdIconProvider
                       .defaultIconSet("./assets/svg/avatars.svg", 128)

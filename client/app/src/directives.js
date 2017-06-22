@@ -35,6 +35,18 @@
         }
       }
     }
-  ]);
-
+  ])
+  .directive('backImage', function(configService) {
+    return {
+      link: function(scope, elem, attrs) {
+        var background = configService.get().application.background;
+        var size = background.match('textures') ? 'repeat' : 'cover';
+        elem.css({
+          'background': background,
+          'background-size': size,
+          'background-position': 'center'
+        });
+      }
+    }
+  })
 })();
