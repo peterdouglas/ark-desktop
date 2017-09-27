@@ -1,18 +1,16 @@
 {
-  "extends": "airbnb-base",
-  "globals": {
-    "angular": true,
-    "window": true,
-    "document": true,
-    "navigator": true
+  "parserOptions": {
+    "ecmaVersion":6
+  },
+  "env": {
+    "es6": true,
+    "jquery": true,
+    "commonjs": true,
+    "browser": true
   },
   "rules": {
-    "no-param-reassign": 0,
-    "new-cap": 0,
-    "comma-dangle": ["error", "never"],
-    "no-unused-vars": 0,
-    "no-plusplus":"off",
-    "func-names": "off",
-    "no-console": "off"
-  }
+    "angular/function-type": [2, "named"],
+    "angular/file-name": [2,{"typeSeparator":"dot", "ignoreTypeSuffix":true}]
+  },
+  "extends": "plugin:angular/johnpapa"
 }

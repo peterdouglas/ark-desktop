@@ -1,9 +1,9 @@
 (function() {
   'use strict';
 
-  angular.module('arkclient.components').directive('qrScanner', ['$rootScope', '$timeout', '$mdDialog', '$mdToast', qrScanner]);
+  angular.module('arkclient.components').directive('qrScanner', ['$rootScope', '$timeout', '$mdDialog', '$mdToast', $document, qrScanner]);
 
-  function qrScanner($rootScope, $timeout, $mdDialog, $mdToast) {
+  function qrScanner($rootScope, $timeout, $mdDialog, $mdToast, $document) {
 
     function controller($scope) {
 
@@ -57,7 +57,7 @@
 
       $scope.openScanner = function(evt) {
         $mdDialog.show({
-          parent: angular.element(document.getElementById('app')),
+          parent: angular.element($document.getElementById('app')),
           templateUrl: './components/qrScanner/qrScanner.html',
           clickOutsideToClose: false,
           targetEvent: evt,

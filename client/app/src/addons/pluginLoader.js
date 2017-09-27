@@ -73,4 +73,4 @@ function PluginLoader(accountService) {
 }
 
 angular.module('arkclient.addons')
-  .service('pluginLoader', ['accountService', PluginLoader]);
+  .factory('pluginLoader', ['accountService', PluginLoader]);

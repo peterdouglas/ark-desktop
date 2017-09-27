@@ -1,11 +1,12 @@
-'use strict';
+
 
 require('angular-qrcode');
 
 window.qrcode = require('qrcode-generator');
 
-var appearanceConfig = require('appearanceConfig');
-var modules = [
+const appearanceConfig = require('appearanceConfig');
+
+const modules = [
   'ngMaterial',
   'md.data.table',
   'gettext',
@@ -14,24 +15,24 @@ var modules = [
   'arkclient.services',
   'arkclient.components',
   'arkclient.directives',
-  'arkclient.accounts',
+  'arkclient.accounts'
 ];
 
-var app = angular.module('arkclient', modules);
+const app = angular.module('arkclient', modules);
 
-app.config(function($mdIconProvider) {
+app.config(($mdIconProvider) => {
   $mdIconProvider
-    .icon("menu", "./assets/svg/menu.svg", 24)
-    .icon("ledger", "./assets/svg/ledger.svg", 24)
-    .icon("qrcode", "./assets/svg/qrcode.svg", 24);
+    .icon('menu', './assets/svg/menu.svg', 24)
+    .icon('ledger', './assets/svg/ledger.svg', 24)
+    .icon('qrcode', './assets/svg/qrcode.svg', 24);
 });
 
-app.config(function($provide, $mdThemingProvider) {
-  var themes = appearanceConfig.themes;
-  var themeNames = Object.keys(themes);
+app.config(($provide, $mdThemingProvider) => {
+  const themes = appearanceConfig.themes;
+  const themeNames = Object.keys(themes);
 
-  themeNames.forEach(function(key) {
-    var theme = $mdThemingProvider.theme(key)
+  themeNames.forEach((key) => {
+    const theme = $mdThemingProvider.theme(key)
       .primaryPalette(themes[key].primary)
       .accentPalette(themes[key].accent)
       .warnPalette(themes[key].warn);
@@ -44,37 +45,38 @@ app.config(function($provide, $mdThemingProvider) {
   $provide.value('$mdThemingProvider', $mdThemingProvider);
 });
 
-app.config(['$qProvider', function($qProvider) {
+app.config(['$qProvider', function ($qProvider) {
   $qProvider.errorOnUnhandledRejections(false);
 }]);
 
 const electron = require('electron');
+
 const remote = electron.remote;
 const Menu = remote.Menu;
 
 const InputMenu = Menu.buildFromTemplate([{
-        label: 'Undo',
-        role: 'undo',
-    }, {
-        label: 'Redo',
-        role: 'redo',
-    }, {
-        type: 'separator',
-    }, {
-        label: 'Cut',
-        role: 'cut',
-    }, {
-        label: 'Copy',
-        role: 'copy',
-    }, {
-        label: 'Paste',
-        role: 'paste',
-    }, {
-        type: 'separator',
-    }, {
-        label: 'Select all',
-        role: 'selectall',
-    },
+  label: 'Undo',
+  role: 'undo'
+}, {
+  label: 'Redo',
+  role: 'redo'
+}, {
+  type: 'separator'
+}, {
+  label: 'Cut',
+  role: 'cut'
+}, {
+  label: 'Copy',
+  role: 'copy'
+}, {
+  label: 'Paste',
+  role: 'paste'
+}, {
+  type: 'separator'
+}, {
+  label: 'Select all',
+  role: 'selectall'
+}
 ]);
 
 document.body.addEventListener('contextmenu', (e) => {
